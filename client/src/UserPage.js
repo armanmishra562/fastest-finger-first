@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './App.css';
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
-const socket = io('http://localhost:5000');
+const socket = io(SERVER_URL);
 
 function UserPage() {
 	const [name, setName] = useState('');
@@ -38,7 +39,7 @@ function UserPage() {
 		const buzzTime = Date.now();
 		const responseDuration = buzzTime - buzzerActivatedAt;
 
-		await fetch('http://localhost:5000/buzz', {
+		await fetch(`${SERVER_URL}/buzz`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ name, responseTime: responseDuration }),

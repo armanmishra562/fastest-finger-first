@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
-const socket = io('http://localhost:5000');
+const socket = io(SERVER_URL);
 
 function Admin() {
 	const [responses, setResponses] = useState([]);
@@ -25,13 +26,13 @@ function Admin() {
 	}, []);
 
 	const fetchResponses = async () => {
-		const res = await fetch('http://localhost:5000/responses');
+		const res = await fetch(`${SERVER_URL}/responses`);
 		const data = await res.json();
 		setResponses(data);
 	};
 
 	const handleReset = async () => {
-		await fetch('http://localhost:5000/reset', { method: 'DELETE' });
+		await fetch(`${SERVER_URL}/reset`, { method: 'DELETE' });
 		setResponses([]);
 		alert('Responses cleared');
 	};
