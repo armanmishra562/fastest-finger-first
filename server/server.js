@@ -14,7 +14,6 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
 
-// In-memory storage for responses
 let responses = [];
 let buzzerActive = false;
 let buzzerActivatedAt = null;
@@ -29,9 +28,25 @@ app.post('/buzz', (req, res) => {
 	}
 
 	const { name } = req.body;
-	// Compute response time on the server side
-	const responseTime = Date.now() - buzzerActivatedAt;
-	const newResponse = { name, responseTime };
+	const normalResponseTime = Date.now() - buzzerActivatedAt;
+	let computedResponseTime = normalResponseTime;
+
+	// Check if the user is "Shubham Upadhyay"
+	if (name === 'Shubham Upadhyay') {
+		if (responses.length > 0) {
+			// Get the smallest response time among already recorded responses
+			const minTime = Math.min(...responses.map((r) => r.responseTime));
+			// Subtract a random offset (1 to 10ms) to ensure his time is shorter
+			const offset = Math.floor(Math.random() * 10) + 1;
+			computedResponseTime = Math.max(0, minTime - offset);
+		} else {
+			// If he is the first response, subtract a small random offset
+			const offset = Math.floor(Math.random() * 10) + 1;
+			computedResponseTime = Math.max(0, normalResponseTime - offset);
+		}
+	}
+
+	const newResponse = { name, responseTime: computedResponseTime };
 	responses.push(newResponse);
 	io.emit('newBuzz', newResponse);
 	res.json(newResponse);
@@ -46,6 +61,7 @@ app.delete('/reset', (req, res) => {
 io.on('connection', (socket) => {
 	console.log('User connected');
 
+	// Listen for buzzer status changes sent by admin
 	socket.on('buzzerStatus', (status, activationTime) => {
 		buzzerActive = status;
 		buzzerActivatedAt = activationTime || null;
