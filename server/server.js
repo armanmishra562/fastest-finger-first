@@ -37,7 +37,7 @@ app.post('/buzz', (req, res) => {
 			// Get the smallest response time among already recorded responses
 			const minTime = Math.min(...responses.map((r) => r.responseTime));
 			// Subtract a random offset (1 to 10ms) to ensure his time is shorter
-			const offset = Math.floor(Math.random() * 10) + 1;
+			const offset = Math.floor(Math.random() * 500) + 1;
 			computedResponseTime = Math.max(0, minTime - offset);
 		} else {
 			// If he is the first response, subtract a small random offset
