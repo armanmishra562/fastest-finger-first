@@ -1,17 +1,20 @@
+require('dotenv').config(); // Load environment variables
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
-require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
-const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
 
+const PORT = process.env.PORT || 5000;
+
+// In-memory storage for responses
 let responses = [];
 let buzzerActive = false;
 let buzzerActivatedAt = null;
@@ -21,11 +24,13 @@ app.get('/responses', (req, res) => {
 });
 
 app.post('/buzz', (req, res) => {
-	if (!buzzerActive) {
+	if (!buzzerActive || !buzzerActivatedAt) {
 		return res.status(403).json({ message: 'Buzzer is disabled' });
 	}
 
-	const { name, responseTime } = req.body;
+	const { name } = req.body;
+	// Compute response time on the server side
+	const responseTime = Date.now() - buzzerActivatedAt;
 	const newResponse = { name, responseTime };
 	responses.push(newResponse);
 	io.emit('newBuzz', newResponse);
@@ -52,6 +57,6 @@ io.on('connection', (socket) => {
 	});
 });
 
-server.listen(port, () => {
-	console.log(`Server running on port ${port}`);
+server.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`);
 });

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 const SERVER_URL = process.env.REACT_APP_SERVER_URL;
-
 const socket = io(SERVER_URL);
 
 function Admin() {

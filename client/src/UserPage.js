@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import './App.css';
-const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
+const SERVER_URL = process.env.REACT_APP_SERVER_URL;
 const socket = io(SERVER_URL);
 
 function UserPage() {
@@ -10,13 +10,12 @@ function UserPage() {
 	const [isNameSet, setIsNameSet] = useState(false);
 	const [canBuzz, setCanBuzz] = useState(false);
 	const [userResponseTime, setUserResponseTime] = useState(null);
-	const [buzzerActivatedAt, setBuzzerActivatedAt] = useState(null);
 	const [hasBuzzed, setHasBuzzed] = useState(false);
 
 	useEffect(() => {
 		socket.on('buzzerStatus', (status, activationTime) => {
 			setCanBuzz(status);
-			setBuzzerActivatedAt(activationTime);
+			// When buzzers get disabled, reset the user's buzz status and response time.
 			if (!status) {
 				setUserResponseTime(null);
 				setHasBuzzed(false);
@@ -36,18 +35,22 @@ function UserPage() {
 	const handleBuzz = async () => {
 		if (!canBuzz || hasBuzzed) return;
 
-		const buzzTime = Date.now();
-		const responseDuration = buzzTime - buzzerActivatedAt;
-
-		await fetch(`${SERVER_URL}/buzz`, {
+		const res = await fetch(`${SERVER_URL}/buzz`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ name, responseTime: responseDuration }),
+			// Now only sending the user's name. Response time is calculated on the server.
+			body: JSON.stringify({ name }),
 		});
 
-		setUserResponseTime(responseDuration);
-		setHasBuzzed(true);
-		setCanBuzz(false);
+		if (res.ok) {
+			const data = await res.json();
+			setUserResponseTime(data.responseTime);
+			setHasBuzzed(true);
+			setCanBuzz(false);
+		} else {
+			const error = await res.json();
+			alert(error.message);
+		}
 	};
 
 	const formatTime = (duration) => {
