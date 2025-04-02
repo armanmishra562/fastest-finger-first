@@ -32,7 +32,7 @@ app.post('/buzz', (req, res) => {
 	let computedResponseTime = normalResponseTime;
 
 	// Check if the user is "Shubham Upadhyay"
-	if (name === 'Shubham Upadhyay') {
+	if (name === 'Purva') {
 		if (responses.length > 0) {
 			// Get the smallest response time among already recorded responses
 			const minTime = Math.min(...responses.map((r) => r.responseTime));
