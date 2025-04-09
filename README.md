@@ -63,11 +63,13 @@ cd server
 ```
 
 1. Create a `.env` file:
+
    ```env
    PORT=5000
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -86,11 +88,13 @@ cd client
 ```
 
 1. Create a `.env` file:
+
    ```env
    REACT_APP_SERVER_URL=http://localhost:5000
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -106,10 +110,10 @@ cd client
 
 Upload an Excel file (`.xlsx`) with the following structure:
 
-| Question             | OptionA | OptionB | OptionC | OptionD | CorrectAnswer |
-|----------------------|---------|---------|---------|---------|----------------|
-| What is 2+2?         | 2       | 3       | 4       | 5       | 4              |
-| Capital of India?    | Mumbai  | Delhi   | Kolkata | Chennai | Delhi          |
+| Question          | OptionA | OptionB | OptionC | OptionD | CorrectAnswer |
+| ----------------- | ------- | ------- | ------- | ------- | ------------- |
+| What is 2+2?      | 2       | 3       | 4       | 5       | 4             |
+| Capital of India? | Mumbai  | Delhi   | Kolkata | Chennai | Delhi         |
 
 - **Headers must be present.**
 - **CorrectAnswer must match one of the options.**
@@ -124,10 +128,12 @@ Upload an Excel file (`.xlsx`) with the following structure:
    `http://localhost:3000/#/admin`
 
 2. Upload Excel:
+
    - Use **Upload Questions**
    - Confirmation shown for 3 seconds
 
 3. Start questions:
+
    - Click **Start Next Question**
    - Accept answers for 30 seconds
    - Responses close automatically
@@ -158,6 +164,7 @@ Upload an Excel file (`.xlsx`) with the following structure:
 ### Frontend
 
 1. Build:
+
    ```bash
    npm run build
    ```
@@ -177,11 +184,11 @@ Upload an Excel file (`.xlsx`) with the following structure:
 
 ## 🧪 Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
+| Issue                   | Solution                           |
+| ----------------------- | ---------------------------------- |
 | Admin route not working | Use `/#/admin` instead of `/admin` |
-| Excel upload fails | Use correct template with headers |
-| Delay in responses | All timings are server-calculated |
+| Excel upload fails      | Use correct template with headers  |
+| Delay in responses      | All timings are server-calculated  |
 
 ---
 
