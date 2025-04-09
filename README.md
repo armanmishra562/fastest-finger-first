@@ -1,6 +1,6 @@
 # 🎯 Real-Time Quiz Game
 
-A real-time quiz game with buzzer functionality. Admin can control question flow and track answers. Users participate live with fair server-side response timing.
+A real-time quiz game. Admin can control question flow and track answers. Users participate live with fair server-side response timing.
 
 ---
 
