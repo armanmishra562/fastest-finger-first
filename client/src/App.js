@@ -1,15 +1,15 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import UserPage from './UserPage';
-import Admin from './Admin';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AdminQuiz from './AdminQuiz';
+import UserQuiz from './UserQuiz';
 import './App.css';
 
 function App() {
 	return (
 		<Router>
 			<Routes>
-				<Route path="/" element={<UserPage />} />
-				<Route path="/admin" element={<Admin />} />
+				<Route path="/" element={<UserQuiz />} />
+				<Route path="/admin" element={<AdminQuiz />} />
 			</Routes>
 		</Router>
 	);
