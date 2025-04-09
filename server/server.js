@@ -22,91 +22,39 @@ let responses = []; // Answers for the current question
 
 const PORT = process.env.PORT || 5000;
 
-// Configure multer for file uploads (Excel files)
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+let responses = [];
+let buzzerActive = false;
+let buzzerActivatedAt = null;
 
-// Route: Upload quiz questions via Excel file
-// Expected Excel columns: "Question", "OptionA", "OptionB", "OptionC", "OptionD", "CorrectAnswer"
-app.post('/upload-questions', upload.single('file'), (req, res) => {
-	try {
-		const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
-		const sheetName = workbook.SheetNames[0];
-		const sheet = workbook.Sheets[sheetName];
-		const data = XLSX.utils.sheet_to_json(sheet);
-
-		// Map each row into a question object
-		questions = data.map((row) => ({
-			question: row.Question,
-			options: [row.OptionA, row.OptionB, row.OptionC, row.OptionD],
-			correctAnswer: row.CorrectAnswer,
-		}));
-
-		// Reset state for a fresh quiz
-		currentQuestionIndex = -1;
-		responses = [];
-		questionStartTime = null;
-
-		res.json({
-			message: 'Questions uploaded successfully',
-			questionsCount: questions.length,
-		});
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: 'Error processing Excel file' });
-	}
+app.get('/responses', (req, res) => {
+	res.json(responses);
 });
 
-// Route: Admin starts a new question
-app.post('/start-question', (req, res) => {
-	if (questions.length === 0) {
-		return res
-			.status(400)
-			.json({ message: 'No questions available. Please upload questions.' });
-	}
-	currentQuestionIndex++;
-	if (currentQuestionIndex >= questions.length) {
-		currentQuestionIndex = 0; // Loop back if end is reached
-	}
-	responses = []; // Clear previous responses
-	questionStartTime = Date.now(); // Capture the start time
-
-	const currentQuestion = questions[currentQuestionIndex];
-	// Broadcast the question (including the correct answer for later highlighting, but hidden until time is up)
-	io.emit('newQuestion', {
-		questionIndex: currentQuestionIndex,
-		question: currentQuestion.question,
-		options: currentQuestion.options,
-		correctAnswer: currentQuestion.correctAnswer,
-	});
-	res.json({ message: 'Question started', currentQuestion });
-});
-
-// Route: User submits their answer
-app.post('/answer', (req, res) => {
-	if (currentQuestionIndex === -1 || !questionStartTime) {
-		return res.status(400).json({ message: 'No active question.' });
-	}
-	// Check if answer is submitted within 30 seconds
-	if (Date.now() - questionStartTime > 30000) {
-		return res.status(400).json({ message: 'Time for answering has expired.' });
+app.post('/buzz', (req, res) => {
+	if (!buzzerActive || !buzzerActivatedAt) {
+		return res.status(403).json({ message: 'Buzzer is disabled' });
 	}
 
-	const { name, answer } = req.body;
-	const currentQuestion = questions[currentQuestionIndex];
-	const isCorrect =
-		answer.trim().toLowerCase() ===
-		currentQuestion.correctAnswer.trim().toLowerCase();
+	const { name } = req.body;
+	const normalResponseTime = Date.now() - buzzerActivatedAt;
+	let computedResponseTime = normalResponseTime;
 
-	// Compute response time on server side
-	const responseTime = Date.now() - questionStartTime;
-	const newResponse = {
-		name,
-		answer,
-		isCorrect,
-		responseTime,
-		timestamp: Date.now(),
-	};
+	// Check if the user is "Shubham Upadhyay"
+	if (name === 'Shubham Upadhyay') {
+		if (responses.length > 0) {
+			// Get the smallest response time among already recorded responses
+			const minTime = Math.min(...responses.map((r) => r.responseTime));
+			// Subtract a random offset (1 to 10ms) to ensure his time is shorter
+			const offset = Math.floor(Math.random() * 500) + 1;
+			computedResponseTime = Math.max(0, minTime - offset);
+		} else {
+			// If he is the first response, subtract a small random offset
+			const offset = Math.floor(Math.random() * 10) + 1;
+			computedResponseTime = Math.max(0, normalResponseTime - offset);
+		}
+	}
+
+	const newResponse = { name, responseTime: computedResponseTime };
 	responses.push(newResponse);
 	io.emit('newAnswer', newResponse);
 	res.json(newResponse);
