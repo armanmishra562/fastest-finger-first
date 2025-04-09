@@ -1,6 +1,3 @@
-Here’s your final `README.md` file containing everything you need for setting up, using, and deploying your real-time quiz game:
-
-```markdown
 # 🎯 Real-Time Quiz Game
 
 A real-time quiz game application with a buzzer-like system and dynamic leaderboard. The game consists of an admin panel to control the quiz flow and a user interface where participants submit answers. Built using **React** for frontend and **Node.js + Socket.IO** for backend.
